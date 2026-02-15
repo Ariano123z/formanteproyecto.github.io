@@ -6,8 +6,7 @@
 <title>Formulario Anteproyecto UTESA</title>
 
 <style>
-/* ✅ MÁS COMPACTO PARA QUE QUEPA EN 1 HOJA */
-@page { size: letter; margin: 10mm 10mm; }
+@page { size: letter; margin: 18mm 15mm; }
 
 body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; }
 
@@ -86,7 +85,7 @@ h3{ text-align:center; margin:18px 0 16px; }
   line-height:1.25;
 }
 
-/* Temas */
+/* Temas: 2 líneas aprox */
 .topic-box{
   min-height:48px;
   height:auto;
@@ -120,7 +119,30 @@ button{
   margin-right:auto;
 }
 
-/* ✅ ESTILO FOCO */
+/* PRINT */
+@media print{
+  button{ display:none !important; }
+  body{ background:#fff; }
+  .form-container{
+    border:none;
+    margin:0 auto;
+    padding:0;
+    max-width:100%;
+  }
+  .grid-2, .grid-3, .header, .signature-block, .footer-note{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  input, textarea, select{
+    color:#000 !important;
+    -webkit-text-fill-color:#000 !important;
+  }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
+}
+
+/* =========================================
+   ✅ ESTILO FOCO (AMARILLO + VERDE + SOMBRA)
+========================================= */
 .field input:focus,
 .field textarea:focus,
 .field select:focus{
@@ -136,7 +158,9 @@ button{
   box-shadow:0 2px 6px rgba(192,0,0,0.15);
 }
 
-/* ✅ FIRMAS ALINEADAS */
+/* =========================================
+   ✅ FIRMAS ALINEADAS (GRID FIJO)
+========================================= */
 .signature-block{
   margin-top:24px;
   font-size:13px;
@@ -161,59 +185,6 @@ button{
 .footer-note{
   font-size:12px;
   margin-top:14px;
-}
-
-/* =========================================
-   ✅ PRINT: AJUSTE PARA QUE SALGA EN 1 HOJA
-========================================= */
-@media print{
-  button{ display:none !important; }
-  body{ background:#fff; }
-
-  /* Quita espacio extra del contenedor */
-  .form-container{
-    border:none;
-    margin:0 auto;
-    padding:0;
-    max-width:100%;
-  }
-
-  /* Compacta tipografía y espaciados SOLO al imprimir */
-  #formulario{
-    font-size: 12px;
-    line-height: 1.15;
-    zoom: 0.95; /* Chrome/Edge */
-  }
-
-  .section-title{ margin-top:10px; margin-bottom:6px; }
-  h3{ margin:12px 0 10px; }
-
-  .grid-2{ gap:24px; margin-bottom:10px; }
-  .grid-3{ gap:16px; margin-bottom:8px; }
-
-  .field label{ font-size:12px; }
-  .field input, .field textarea, .field select{
-    font-size:12px;
-    padding:2px 2px;
-  }
-
-  /* Reduce alturas mínimas de textareas */
-  .field textarea{ min-height:48px; }
-  .topic-box{ min-height:34px; }
-
-  /* Mantén firmas juntas y sin salto */
-  .signature-block, .footer-note, .signature-grid,
-  .header, .grid-2, .grid-3{
-    break-inside:avoid;
-    page-break-inside:avoid;
-  }
-
-  /* Asegura texto negro */
-  input, textarea, select{
-    color:#000 !important;
-    -webkit-text-fill-color:#000 !important;
-  }
-  input::placeholder, textarea::placeholder { color: transparent !important; }
 }
 </style>
 </head>
@@ -360,6 +331,7 @@ button{
     <div class="error-text" id="err_motivacion">Este campo es obligatorio.</div>
   </div>
 
+  <!-- ✅ FIRMAS ALINEADAS -->
   <div class="signature-block">
     <div class="signature-grid">
       <div class="label">Firma Director de Carrera:</div>
@@ -385,7 +357,10 @@ button{
 <script>
 function soloDigitos(valor) { return valor.replace(/\D/g, ''); }
 
-/* CUATRIMESTRE AUTO */
+/* ===============================
+   CUATRIMESTRE AUTO (N-AAAA)
+   Ene-Abr => 1, May-Ago => 2, Sep-Dic => 3
+================================= */
 function calcularCuatrimestreAutomatico() {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -398,7 +373,7 @@ function calcularCuatrimestreAutomatico() {
 }
 
 function formatCuatrimestre(value) {
-  const digits = soloDigitos(value).slice(0, 5);
+  const digits = soloDigitos(value).slice(0, 5); // 1 + 4
   if (digits.length <= 1) return digits;
   return digits[0] + "-" + digits.slice(1);
 }
@@ -532,4 +507,180 @@ function validarEstudiante(n) {
 
   let ok = true;
 
-  const ok
+  const okNombre = nombre.value.trim().length > 0;
+  pintarEstado(nombre, okNombre, "err_" + nombre.id);
+  if (!okNombre) ok = false;
+
+  const okMat = validarMatriculaCampo(matricula);
+  pintarEstado(matricula, okMat, "err_" + matricula.id);
+  if (!okMat) ok = false;
+
+  const okTel = validarTelefonoCampo(telefono);
+  pintarEstado(telefono, okTel, "err_" + telefono.id);
+  if (!okTel) ok = false;
+
+  return ok;
+}
+
+function validarGrupoEstudianteDesdeCampo(input) {
+  const m = input.id.match(/^est(\d)_/);
+  if (!m) return;
+  const n = parseInt(m[1], 10);
+
+  if (!estudianteActivo(n)) {
+    limpiarEstado(input);
+    const matricula = document.getElementById(`est${n}_matricula`);
+    const telefono = document.getElementById(`est${n}_telefono`);
+    if (matricula) limpiarEstado(matricula);
+    if (telefono) limpiarEstado(telefono);
+    return;
+  }
+
+  validarEstudiante(n);
+}
+
+/* Tema preferido coherente con temas llenos */
+function validarTemaPreferido() {
+  const tema1 = document.getElementById("tema1").value.trim();
+  const tema2 = document.getElementById("tema2").value.trim();
+  const tema3 = document.getElementById("tema3").value.trim();
+  const pref  = document.getElementById("tema_pref");
+
+  const okTema1 = tema1.length > 0;
+  pintarEstado(document.getElementById("tema1"), okTema1, "err_tema1");
+
+  const opt2 = pref.querySelector('option[value="2"]');
+  const opt3 = pref.querySelector('option[value="3"]');
+  if (opt2) opt2.disabled = tema2.length === 0;
+  if (opt3) opt3.disabled = tema3.length === 0;
+
+  const valor = pref.value;
+  let okPref = valor !== "";
+  if (valor === "2" && tema2.length === 0) okPref = false;
+  if (valor === "3" && tema3.length === 0) okPref = false;
+  if (valor === "1" && tema1.length === 0) okPref = false;
+
+  pintarEstado(pref, okPref, "err_tema_pref");
+
+  return okTema1 && okPref;
+}
+
+/* Validación general */
+function validarAntesDeImprimir() {
+  let ok = true;
+
+  if (!validarEstudiante(1)) ok = false;
+  if (!validarEstudiante(2)) ok = false;
+  if (!validarEstudiante(3)) ok = false;
+
+  const carrera = document.getElementById("carrera");
+  const cuatrimestre = document.getElementById("cuatrimestre");
+  const motivacion = document.getElementById("motivacion");
+
+  const okCarrera = carrera.value.trim().length > 0;
+  pintarEstado(carrera, okCarrera, "err_carrera");
+  if (!okCarrera) ok = false;
+
+  const okCuat = validarCuatrimestreCampo(cuatrimestre);
+  pintarEstado(cuatrimestre, okCuat, "err_cuatrimestre");
+  if (!okCuat) ok = false;
+
+  const okMot = motivacion.value.trim().length > 0;
+  pintarEstado(motivacion, okMot, "err_motivacion");
+  if (!okMot) ok = false;
+
+  if (!validarTemaPreferido()) ok = false;
+
+  // Formatear teléfonos antes de imprimir
+  document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
+    aplicarMascaraTelefono(inp);
+    const m = inp.id.match(/^est(\d)_/);
+    if (m && !estudianteActivo(parseInt(m[1],10))) limpiarEstado(inp);
+  });
+
+  if (!ok) {
+    const primero = document.querySelector(".invalid");
+    if (primero) primero.scrollIntoView({ behavior:"smooth", block:"center" });
+    alert("No se puede generar el PDF: hay campos incompletos o inválidos. Revisa los campos marcados en rojo.");
+  }
+
+  return ok;
+}
+
+/* Hooks */
+document.addEventListener("DOMContentLoaded", () => {
+  // Autocompletar cuatrimestre
+  const cuat = document.getElementById("cuatrimestre");
+  if (cuat && cuat.value.trim() === "") cuat.value = calcularCuatrimestreAutomatico();
+
+  // Cuatrimestre: máscara y validación
+  if (cuat) {
+    cuat.addEventListener("input", () => {
+      cuat.value = formatCuatrimestre(cuat.value);
+      const ok = validarCuatrimestreCampo(cuat) || cuat.value.trim() === "";
+      pintarEstado(cuat, ok, "err_cuatrimestre");
+    });
+    cuat.addEventListener("blur", () => {
+      const ok = validarCuatrimestreCampo(cuat);
+      pintarEstado(cuat, ok, "err_cuatrimestre");
+    });
+  }
+
+  // Teléfonos
+  document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
+    inp.addEventListener("input", () => {
+      aplicarMascaraTelefono(inp);
+      validarGrupoEstudianteDesdeCampo(inp);
+    });
+    inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
+  });
+
+  // Matrículas
+  document.querySelectorAll('[data-validate="matricula"]').forEach(inp => {
+    inp.addEventListener("input", onMatriculaInput);
+    inp.addEventListener("keydown", onMatriculaKeyDown);
+    inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
+  });
+
+  // Nombres
+  [1,2,3].forEach(n => {
+    const nombre = document.getElementById(`est${n}_nombre`);
+    if (!nombre) return;
+    nombre.addEventListener("input", () => validarEstudiante(n));
+    nombre.addEventListener("blur", () => validarEstudiante(n));
+  });
+
+  // Temas y preferido
+  ["tema1","tema2","tema3"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", validarTemaPreferido);
+    el.addEventListener("blur", validarTemaPreferido);
+  });
+
+  const pref = document.getElementById("tema_pref");
+  if (pref) {
+    pref.addEventListener("change", validarTemaPreferido);
+    pref.addEventListener("blur", validarTemaPreferido);
+  }
+
+  // Limpiar rojo en campos generales
+  ["carrera","motivacion"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      if (el.value.trim().length > 0) limpiarEstado(el);
+    });
+  });
+
+  validarTemaPreferido();
+});
+
+function generarPDF() {
+  if (!validarAntesDeImprimir()) return;
+  window.print();
+}
+</script>
+
+</body>
+</html>
