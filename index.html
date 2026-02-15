@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Formulario Anteproyecto UTESA</title>
+
+<style>
+@page { size: letter; margin: 18mm 15mm; }
+
+body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; }
+
+.form-container{
+  background:#fff;
+  max-width:850px;
+  margin:20px auto;
+  padding:20px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border-bottom:2px solid #006633;
+  padding-bottom:8px;
+}
+.header img{ width:85px; height:auto; }
+
+.header-text{ text-align:center; flex:1; }
+.header-text h2{ margin:0; font-size:17px; }
+.header-text p{ margin:2px 0; font-size:12px; }
+
+h3{ text-align:center; margin:18px 0 16px; }
+
+.section-title{ font-weight:bold; margin-top:14px; margin-bottom:8px; }
+
+.grid-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:36px;
+  margin-bottom:14px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr;
+  gap:22px;
+  margin-bottom:12px;
+}
+
+.field label{ font-size:13px; display:block; }
+
+.field input, .field textarea, .field select{
+  width:100%;
+  border:none;
+  border-bottom:1px solid #000;
+  padding:3px 2px;
+  font-size:13px;
+  background:transparent;
+  box-sizing:border-box;
+  outline:none;
+  transition: background-color .2s ease, border-bottom-color .2s ease, box-shadow .2s ease;
+}
+
+/* Select estilo línea */
+.field select{
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #000 50%),
+    linear-gradient(135deg, #000 50%, transparent 50%);
+  background-position: calc(100% - 12px) 55%, calc(100% - 7px) 55%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 22px;
+}
+
+/* Motivación y Temas: textarea sin resize */
+.field textarea{
+  resize:none;
+  min-height:60px;
+  line-height:1.25;
+}
+
+/* Temas: 2 líneas aprox */
+.topic-box{
+  min-height:48px;
+  height:auto;
+  overflow:hidden;
+}
+
+/* Validación visual */
+input.invalid, textarea.invalid, select.invalid{
+  border-bottom:2px solid #c00000 !important;
+}
+
+.error-text{
+  font-size:12px;
+  color:#c00000;
+  margin-top:4px;
+  display:none;
+}
+.error-text.show{ display:block; }
+
+/* Botón */
+button{
+  margin-top:22px;
+  padding:10px 22px;
+  background:#006633;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  display:block;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* PRINT */
+@media print{
+  button{ display:none !important; }
+  body{ background:#fff; }
+  .form-container{
+    border:none;
+    margin:0 auto;
+    padding:0;
+    max-width:100%;
+  }
+  .grid-2, .grid-3, .header, .signature-block, .footer-note{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+  input, textarea, select{
+    color:#000 !important;
+    -webkit-text-fill-color:#000 !important;
+  }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
+}
+
+/* =========================================
+   ✅ ESTILO FOCO (AMARILLO + VERDE + SOMBRA)
+========================================= */
+.field input:focus,
+.field textarea:focus,
+.field select:focus{
+  background-color:#fffde7;
+  border-bottom:2px solid #006633;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.field input.invalid:focus,
+.field textarea.invalid:focus,
+.field select.invalid:focus{
+  background-color:#ffe6e6;
+  box-shadow:0 2px 6px rgba(192,0,0,0.15);
+}
+
+/* =========================================
+   ✅ FIRMAS ALINEADAS (GRID FIJO)
+========================================= */
+.signature-block{
+  margin-top:24px;
+  font-size:13px;
+}
+
+.signature-grid{
+  display:grid;
+  grid-template-columns: 280px 1fr 70px 180px;
+  row-gap:18px;
+  column-gap:12px;
+  align-items:end;
+}
+
+.signature-grid .label{ white-space:nowrap; }
+.signature-grid .fecha{ text-align:right; }
+
+.line{
+  border-bottom:1px solid #000;
+  height:18px;
+}
+
+.footer-note{
+  font-size:12px;
+  margin-top:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="form-container" id="formulario">
+
+  <div class="header">
+    <img src="logo.png" alt="Logo UTESA">
+    <div class="header-text">
+      <h2>UNIVERSIDAD TECNOLÓGICA DE SANTIAGO (UTESA)</h2>
+      <p>SISTEMA CORPORATIVO</p>
+      <p><em>Inspirando líderes a través de la investigación, la innovación y el emprendimiento</em></p>
+    </div>
+  </div>
+
+  <h3>FORMULARIO SOLICITUD DE ANTEPROYECTO DE GRADO</h3>
+
+  <div class="section-title">I. DATOS SOBRE LOS ESTUDIANTES</div>
+
+  <div class="grid-2">
+    <div class="field">
+      <label for="carrera">Carrera</label>
+      <input id="carrera" name="carrera" type="text" required>
+      <div class="error-text" id="err_carrera">Este campo es obligatorio.</div>
+    </div>
+
+    <div class="field">
+      <label for="cuatrimestre">Cuatrimestre</label>
+      <input id="cuatrimestre" name="cuatrimestre" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="6" required>
+      <div class="error-text" id="err_cuatrimestre">Formato válido: 1-2026</div>
+    </div>
+  </div>
+
+  <!-- Estudiante 1 -->
+  <div class="grid-3">
+    <div class="field">
+      <label for="est1_nombre">1. Nombre del Estudiante</label>
+      <input id="est1_nombre" name="est1_nombre" type="text">
+      <div class="error-text" id="err_est1_nombre">Completa el nombre para validar este estudiante.</div>
+    </div>
+
+    <div class="field">
+      <label for="est1_matricula">Matrícula</label>
+      <input id="est1_matricula" name="est1_matricula" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="8"
+             data-validate="matricula">
+      <div class="error-text" id="err_est1_matricula">La matrícula debe tener 7 dígitos (123-4567).</div>
+    </div>
+
+    <div class="field">
+      <label for="est1_telefono">Teléfono</label>
+      <input id="est1_telefono" name="est1_telefono" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="12"
+             data-validate="telefono">
+      <div class="error-text" id="err_est1_telefono">El teléfono debe tener exactamente 10 números (809-555-1234).</div>
+    </div>
+  </div>
+
+  <!-- Estudiante 2 -->
+  <div class="grid-3">
+    <div class="field">
+      <label for="est2_nombre">2. Nombre del Estudiante</label>
+      <input id="est2_nombre" name="est2_nombre" type="text">
+      <div class="error-text" id="err_est2_nombre">Completa el nombre para validar este estudiante.</div>
+    </div>
+
+    <div class="field">
+      <label for="est2_matricula">Matrícula</label>
+      <input id="est2_matricula" name="est2_matricula" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="8"
+             data-validate="matricula">
+      <div class="error-text" id="err_est2_matricula">La matrícula debe tener 7 dígitos (123-4567).</div>
+    </div>
+
+    <div class="field">
+      <label for="est2_telefono">Teléfono</label>
+      <input id="est2_telefono" name="est2_telefono" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="12"
+             data-validate="telefono">
+      <div class="error-text" id="err_est2_telefono">El teléfono debe tener exactamente 10 números (809-555-1234).</div>
+    </div>
+  </div>
+
+  <!-- Estudiante 3 -->
+  <div class="grid-3">
+    <div class="field">
+      <label for="est3_nombre">3. Nombre del Estudiante</label>
+      <input id="est3_nombre" name="est3_nombre" type="text">
+      <div class="error-text" id="err_est3_nombre">Completa el nombre para validar este estudiante.</div>
+    </div>
+
+    <div class="field">
+      <label for="est3_matricula">Matrícula</label>
+      <input id="est3_matricula" name="est3_matricula" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="8"
+             data-validate="matricula">
+      <div class="error-text" id="err_est3_matricula">La matrícula debe tener 7 dígitos (123-4567).</div>
+    </div>
+
+    <div class="field">
+      <label for="est3_telefono">Teléfono</label>
+      <input id="est3_telefono" name="est3_telefono" type="text"
+             inputmode="numeric" autocomplete="off" maxlength="12"
+             data-validate="telefono">
+      <div class="error-text" id="err_est3_telefono">El teléfono debe tener exactamente 10 números (809-555-1234).</div>
+    </div>
+  </div>
+
+  <div class="section-title">II. PROPUESTA DE TEMAS DE PROYECTO</div>
+
+  <div class="field" style="margin-bottom:12px;">
+    <label for="tema1">1. Nombre del Tema</label>
+    <textarea id="tema1" name="tema1" class="topic-box" required></textarea>
+    <div class="error-text" id="err_tema1">Debes escribir al menos un tema.</div>
+  </div>
+
+  <div class="field" style="margin-bottom:12px;">
+    <label for="tema2">2. Nombre del Tema</label>
+    <textarea id="tema2" name="tema2" class="topic-box"></textarea>
+  </div>
+
+  <div class="field" style="margin-bottom:12px;">
+    <label for="tema3">3. Nombre del Tema</label>
+    <textarea id="tema3" name="tema3" class="topic-box"></textarea>
+  </div>
+
+  <div class="field" style="margin-bottom:12px;">
+    <label for="tema_pref">El tema que prefiere es el número:</label>
+    <select id="tema_pref" name="tema_pref" required>
+      <option value="" selected disabled>Seleccione…</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
+    <div class="error-text" id="err_tema_pref">Selecciona 1, 2 o 3.</div>
+  </div>
+
+  <div class="field" style="margin-bottom:12px;">
+    <label for="motivacion">¿Cuál es la motivación personal que lo llevó a elegir ese tema?</label>
+    <textarea id="motivacion" name="motivacion" required></textarea>
+    <div class="error-text" id="err_motivacion">Este campo es obligatorio.</div>
+  </div>
+
+  <!-- ✅ FIRMAS ALINEADAS -->
+  <div class="signature-block">
+    <div class="signature-grid">
+      <div class="label">Firma Director de Carrera:</div>
+      <div class="line"></div>
+      <div class="label fecha">Fecha:</div>
+      <div class="line"></div>
+
+      <div class="label">Firma Director de Proyecto de Grado:</div>
+      <div class="line"></div>
+      <div class="label fecha">Fecha:</div>
+      <div class="line"></div>
+    </div>
+
+    <div class="footer-note">
+      Nota: El Director de carrera debe asegurarse de que el tema aprobado sea llenado por los estudiantes antes de proceder a colocar su firma validando el mismo.
+    </div>
+  </div>
+
+  <button type="button" onclick="generarPDF()">Generar PDF</button>
+
+</div>
+
+<script>
+function soloDigitos(valor) { return valor.replace(/\D/g, ''); }
+
+/* ===============================
+   CUATRIMESTRE AUTO (N-AAAA)
+   Ene-Abr => 1, May-Ago => 2, Sep-Dic => 3
+================================= */
+function calcularCuatrimestreAutomatico() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+  let n = 3;
+  if (month >= 1 && month <= 4) n = 1;
+  else if (month >= 5 && month <= 8) n = 2;
+  else n = 3;
+  return `${n}-${year}`;
+}
+
+function formatCuatrimestre(value) {
+  const digits = soloDigitos(value).slice(0, 5); // 1 + 4
+  if (digits.length <= 1) return digits;
+  return digits[0] + "-" + digits.slice(1);
+}
+
+function validarCuatrimestreCampo(input) {
+  input.value = formatCuatrimestre(input.value);
+  const v = input.value.trim();
+  const m = v.match(/^([1-3])-(\d{4})$/);
+  if (!m) return false;
+  const year = parseInt(m[2], 10);
+  return year >= 1900 && year <= 2099;
+}
+
+/* TELÉFONO máscara ###-###-#### */
+function aplicarMascaraTelefono(input) {
+  let numeros = soloDigitos(input.value);
+  if (numeros.length > 10) numeros = numeros.slice(0, 10);
+
+  let formato = numeros;
+  if (numeros.length > 6) {
+    formato = numeros.slice(0,3) + "-" + numeros.slice(3,6) + "-" + numeros.slice(6);
+  } else if (numeros.length > 3) {
+    formato = numeros.slice(0,3) + "-" + numeros.slice(3);
+  }
+  input.value = formato;
+}
+
+/* MATRÍCULA máscara ###-#### */
+function formatMatricula(digits) {
+  const d = digits.slice(0, 7);
+  if (d.length <= 3) return d;
+  return d.slice(0, 3) + "-" + d.slice(3);
+}
+
+function setCaret(input, pos) {
+  requestAnimationFrame(() => { try { input.setSelectionRange(pos, pos); } catch {} });
+}
+
+function onMatriculaInput(e) {
+  const input = e.target;
+  const oldValue = input.value;
+  const oldPos = input.selectionStart ?? oldValue.length;
+
+  const digits = soloDigitos(oldValue).slice(0, 7);
+  const newValue = formatMatricula(digits);
+
+  const leftPart = oldValue.slice(0, oldPos);
+  const leftDigitsCount = soloDigitos(leftPart).length;
+
+  let newPos = leftDigitsCount;
+  if (leftDigitsCount > 3) newPos += 1;
+
+  input.value = newValue;
+  if (newPos === 3 && newValue.length > 3) newPos = 4;
+  setCaret(input, newPos);
+
+  validarGrupoEstudianteDesdeCampo(input);
+}
+
+function onMatriculaKeyDown(e) {
+  const input = e.target;
+  const pos = input.selectionStart ?? 0;
+
+  if (e.key === "Backspace" && pos === 4 && input.value[3] === "-") {
+    e.preventDefault();
+    const digits = soloDigitos(input.value);
+    const newDigits = digits.slice(0, 2) + digits.slice(3);
+    input.value = formatMatricula(newDigits);
+    setCaret(input, 3);
+    validarGrupoEstudianteDesdeCampo(input);
+  }
+
+  if (e.key === "Delete" && pos === 3 && input.value[3] === "-") {
+    e.preventDefault();
+    const digits = soloDigitos(input.value);
+    const newDigits = digits.slice(0, 3) + digits.slice(4);
+    input.value = formatMatricula(newDigits);
+    setCaret(input, 3);
+    validarGrupoEstudianteDesdeCampo(input);
+  }
+}
+
+/* Visual */
+function pintarEstado(input, ok, errorId) {
+  const err = document.getElementById(errorId);
+  if (!ok) {
+    input.classList.add("invalid");
+    if (err) err.classList.add("show");
+  } else {
+    input.classList.remove("invalid");
+    if (err) err.classList.remove("show");
+  }
+}
+
+function limpiarEstado(input) {
+  input.classList.remove("invalid");
+  const err = document.getElementById("err_" + input.id);
+  if (err) err.classList.remove("show");
+}
+
+/* Estudiantes condicionales por nombre */
+function estudianteActivo(n) {
+  const nombre = document.getElementById(`est${n}_nombre`);
+  return nombre && nombre.value.trim().length > 0;
+}
+
+function validarMatriculaCampo(input) {
+  const digits = soloDigitos(input.value).slice(0, 7);
+  input.value = formatMatricula(digits);
+  return digits.length === 7;
+}
+
+function validarTelefonoCampo(input) {
+  const digits = soloDigitos(input.value);
+  return digits.length === 10;
+}
+
+function validarEstudiante(n) {
+  const nombre = document.getElementById(`est${n}_nombre`);
+  const matricula = document.getElementById(`est${n}_matricula`);
+  const telefono = document.getElementById(`est${n}_telefono`);
+
+  if (!nombre || !matricula || !telefono) return true;
+
+  if (nombre.value.trim() === "") {
+    limpiarEstado(nombre);
+    limpiarEstado(matricula);
+    limpiarEstado(telefono);
+    return true;
+  }
+
+  let ok = true;
+
+  const okNombre = nombre.value.trim().length > 0;
+  pintarEstado(nombre, okNombre, "err_" + nombre.id);
+  if (!okNombre) ok = false;
+
+  const okMat = validarMatriculaCampo(matricula);
+  pintarEstado(matricula, okMat, "err_" + matricula.id);
+  if (!okMat) ok = false;
+
+  const okTel = validarTelefonoCampo(telefono);
+  pintarEstado(telefono, okTel, "err_" + telefono.id);
+  if (!okTel) ok = false;
+
+  return ok;
+}
+
+function validarGrupoEstudianteDesdeCampo(input) {
+  const m = input.id.match(/^est(\d)_/);
+  if (!m) return;
+  const n = parseInt(m[1], 10);
+
+  if (!estudianteActivo(n)) {
+    limpiarEstado(input);
+    const matricula = document.getElementById(`est${n}_matricula`);
+    const telefono = document.getElementById(`est${n}_telefono`);
+    if (matricula) limpiarEstado(matricula);
+    if (telefono) limpiarEstado(telefono);
+    return;
+  }
+
+  validarEstudiante(n);
+}
+
+/* Tema preferido coherente con temas llenos */
+function validarTemaPreferido() {
+  const tema1 = document.getElementById("tema1").value.trim();
+  const tema2 = document.getElementById("tema2").value.trim();
+  const tema3 = document.getElementById("tema3").value.trim();
+  const pref  = document.getElementById("tema_pref");
+
+  const okTema1 = tema1.length > 0;
+  pintarEstado(document.getElementById("tema1"), okTema1, "err_tema1");
+
+  const opt2 = pref.querySelector('option[value="2"]');
+  const opt3 = pref.querySelector('option[value="3"]');
+  if (opt2) opt2.disabled = tema2.length === 0;
+  if (opt3) opt3.disabled = tema3.length === 0;
+
+  const valor = pref.value;
+  let okPref = valor !== "";
+  if (valor === "2" && tema2.length === 0) okPref = false;
+  if (valor === "3" && tema3.length === 0) okPref = false;
+  if (valor === "1" && tema1.length === 0) okPref = false;
+
+  pintarEstado(pref, okPref, "err_tema_pref");
+
+  return okTema1 && okPref;
+}
+
+/* Validación general */
+function validarAntesDeImprimir() {
+  let ok = true;
+
+  if (!validarEstudiante(1)) ok = false;
+  if (!validarEstudiante(2)) ok = false;
+  if (!validarEstudiante(3)) ok = false;
+
+  const carrera = document.getElementById("carrera");
+  const cuatrimestre = document.getElementById("cuatrimestre");
+  const motivacion = document.getElementById("motivacion");
+
+  const okCarrera = carrera.value.trim().length > 0;
+  pintarEstado(carrera, okCarrera, "err_carrera");
+  if (!okCarrera) ok = false;
+
+  const okCuat = validarCuatrimestreCampo(cuatrimestre);
+  pintarEstado(cuatrimestre, okCuat, "err_cuatrimestre");
+  if (!okCuat) ok = false;
+
+  const okMot = motivacion.value.trim().length > 0;
+  pintarEstado(motivacion, okMot, "err_motivacion");
+  if (!okMot) ok = false;
+
+  if (!validarTemaPreferido()) ok = false;
+
+  // Formatear teléfonos antes de imprimir
+  document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
+    aplicarMascaraTelefono(inp);
+    const m = inp.id.match(/^est(\d)_/);
+    if (m && !estudianteActivo(parseInt(m[1],10))) limpiarEstado(inp);
+  });
+
+  if (!ok) {
+    const primero = document.querySelector(".invalid");
+    if (primero) primero.scrollIntoView({ behavior:"smooth", block:"center" });
+    alert("No se puede generar el PDF: hay campos incompletos o inválidos. Revisa los campos marcados en rojo.");
+  }
+
+  return ok;
+}
+
+/* Hooks */
+document.addEventListener("DOMContentLoaded", () => {
+  // Autocompletar cuatrimestre
+  const cuat = document.getElementById("cuatrimestre");
+  if (cuat && cuat.value.trim() === "") cuat.value = calcularCuatrimestreAutomatico();
+
+  // Cuatrimestre: máscara y validación
+  if (cuat) {
+    cuat.addEventListener("input", () => {
+      cuat.value = formatCuatrimestre(cuat.value);
+      const ok = validarCuatrimestreCampo(cuat) || cuat.value.trim() === "";
+      pintarEstado(cuat, ok, "err_cuatrimestre");
+    });
+    cuat.addEventListener("blur", () => {
+      const ok = validarCuatrimestreCampo(cuat);
+      pintarEstado(cuat, ok, "err_cuatrimestre");
+    });
+  }
+
+  // Teléfonos
+  document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
+    inp.addEventListener("input", () => {
+      aplicarMascaraTelefono(inp);
+      validarGrupoEstudianteDesdeCampo(inp);
+    });
+    inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
+  });
+
+  // Matrículas
+  document.querySelectorAll('[data-validate="matricula"]').forEach(inp => {
+    inp.addEventListener("input", onMatriculaInput);
+    inp.addEventListener("keydown", onMatriculaKeyDown);
+    inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
+  });
+
+  // Nombres
+  [1,2,3].forEach(n => {
+    const nombre = document.getElementById(`est${n}_nombre`);
+    if (!nombre) return;
+    nombre.addEventListener("input", () => validarEstudiante(n));
+    nombre.addEventListener("blur", () => validarEstudiante(n));
+  });
+
+  // Temas y preferido
+  ["tema1","tema2","tema3"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", validarTemaPreferido);
+    el.addEventListener("blur", validarTemaPreferido);
+  });
+
+  const pref = document.getElementById("tema_pref");
+  if (pref) {
+    pref.addEventListener("change", validarTemaPreferido);
+    pref.addEventListener("blur", validarTemaPreferido);
+  }
+
+  // Limpiar rojo en campos generales
+  ["carrera","motivacion"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      if (el.value.trim().length > 0) limpiarEstado(el);
+    });
+  });
+
+  validarTemaPreferido();
+});
+
+function generarPDF() {
+  if (!validarAntesDeImprimir()) return;
+  window.print();
+}
+</script>
+
+</body>
+</html>
