@@ -199,7 +199,7 @@ button{
 
 /* ==========================
    ✅ RESPONSIVE (MÓVIL)
-   Versión “más bonita” para firmas
+   Arregla que las líneas se salgan
 ========================== */
 @media (max-width: 520px){
 
@@ -220,43 +220,21 @@ button{
     gap: 12px;
   }
 
-  /* 🔥 Firmas en bloques: Firma + línea, Fecha + línea */
+  /* ✅ Firmas: una columna, todo dentro del ancho */
   .signature-grid{
     grid-template-columns: 1fr;
     row-gap: 10px;
   }
 
-  /* Ocultamos el layout de escritorio y usamos bloques */
-  .signature-grid .label.fecha{ text-align:left; }
-
-  /* Bloques móviles */
-  .sig-mobile{
-    display:grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 14px;
+  .signature-grid .label,
+  .signature-grid .fecha{
+    text-align:left;
+    white-space:normal;
   }
 
-  .sig-row{
-    display:grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px;
-    align-items:end;
-  }
-
-  .sig-row .sig-label{
-    white-space:nowrap;
-  }
-
-  .sig-row .sig-line{
-    border-bottom:1px solid #000;
+  .line{
     height:16px;
-    width:100%;
   }
-
-  /* En móvil: ocultamos la grilla de escritorio visualmente */
-  .signature-grid.desktop-only{ display:none; }
-  .signature-grid.mobile-only{ display:block; }
 }
 
 /* ==========================
@@ -297,7 +275,7 @@ button{
   .field textarea{ min-height:48px; }
   .topic-box{ min-height:34px; }
 
-  .grid-2, .grid-3, .header, .signature-block, .footer-note{
+  .grid-2, .grid-3, .header, .signature-block, .footer-note, .signature-grid{
     break-inside:avoid;
     page-break-inside:avoid;
   }
@@ -307,10 +285,6 @@ button{
     -webkit-text-fill-color:#000 !important;
   }
   input::placeholder, textarea::placeholder { color: transparent !important; }
-
-  /* En impresión: forzamos el layout de escritorio */
-  .signature-grid.desktop-only{ display:grid !important; }
-  .signature-grid.mobile-only{ display:none !important; }
 }
 </style>
 </head>
@@ -460,11 +434,10 @@ button{
   <div class="signature-block">
 
     <div class="uso-exclusivo">
-      ESTE ESPACIO ES PARA USO EXCLUSIVO DEL DEPARTAMENTO DE PROYECTO DE GRADO.
+      Este espacio es para uso exclusivo del Departamento de Proyecto de Grado.
     </div>
 
-    <!-- ✅ ESCRITORIO (4 columnas) -->
-    <div class="signature-grid desktop-only">
+    <div class="signature-grid">
       <div class="label">Firma Director de Carrera:</div>
       <div class="line"></div>
       <div class="label fecha">Fecha:</div>
@@ -474,31 +447,6 @@ button{
       <div class="line"></div>
       <div class="label fecha">Fecha:</div>
       <div class="line"></div>
-    </div>
-
-    <!-- ✅ MÓVIL (bloques bonitos) -->
-    <div class="signature-grid mobile-only" style="display:none;">
-      <div class="sig-mobile">
-        <div class="sig-row">
-          <div class="sig-label">Firma Director de Carrera:</div>
-          <div class="sig-line"></div>
-        </div>
-        <div class="sig-row">
-          <div class="sig-label">Fecha:</div>
-          <div class="sig-line"></div>
-        </div>
-      </div>
-
-      <div class="sig-mobile">
-        <div class="sig-row">
-          <div class="sig-label">Firma Director de Proyecto de Grado:</div>
-          <div class="sig-line"></div>
-        </div>
-        <div class="sig-row">
-          <div class="sig-label">Fecha:</div>
-          <div class="sig-line"></div>
-        </div>
-      </div>
     </div>
 
     <div class="footer-note">
