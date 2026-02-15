@@ -6,7 +6,7 @@
 <title>Formulario Anteproyecto UTESA</title>
 
 <style>
-/* ✅ AJUSTE CLAVE PARA 1 HOJA */
+/* ✅ AJUSTE PARA 1 HOJA EN IMPRESIÓN */
 @page { size: letter; margin: 10mm 10mm; }
 
 body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; }
@@ -79,14 +79,13 @@ h3{ text-align:center; margin:18px 0 16px; }
   padding-right: 22px;
 }
 
-/* Motivación y Temas: textarea sin resize */
+/* Motivación y Temas */
 .field textarea{
   resize:none;
   min-height:60px;
   line-height:1.25;
 }
 
-/* Temas */
 .topic-box{
   min-height:48px;
   height:auto;
@@ -136,12 +135,13 @@ button{
   box-shadow:0 2px 6px rgba(192,0,0,0.15);
 }
 
-/* ✅ FIRMAS ALINEADAS */
+/* ✅ FIRMAS */
 .signature-block{
   margin-top:24px;
   font-size:13px;
 }
 
+/* Escritorio: grilla 4 columnas */
 .signature-grid{
   display:grid;
   grid-template-columns: 280px 1fr 70px 180px;
@@ -156,6 +156,8 @@ button{
 .line{
   border-bottom:1px solid #000;
   height:18px;
+  width:100%;
+  min-width:0;
 }
 
 .footer-note{
@@ -163,7 +165,7 @@ button{
   margin-top:14px;
 }
 
-/* ✅ Texto de uso exclusivo */
+/* Texto de uso exclusivo */
 .uso-exclusivo{
   font-size:12px;
   font-style:italic;
@@ -173,7 +175,7 @@ button{
   text-align:center;
 }
 
-/* ✅ Mensaje verde de éxito */
+/* ✅ Toast */
 .toast{
   position: fixed;
   left: 50%;
@@ -196,6 +198,46 @@ button{
 }
 
 /* ==========================
+   ✅ RESPONSIVE (MÓVIL)
+   Arregla que las líneas se salgan
+========================== */
+@media (max-width: 520px){
+
+  .form-container{
+    margin: 10px;
+    padding: 14px;
+  }
+
+  .header img{ width:70px; }
+
+  .grid-2{
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .grid-3{
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* ✅ Firmas: una columna, todo dentro del ancho */
+  .signature-grid{
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+  }
+
+  .signature-grid .label,
+  .signature-grid .fecha{
+    text-align:left;
+    white-space:normal;
+  }
+
+  .line{
+    height:16px;
+  }
+}
+
+/* ==========================
    ✅ PRINT: COMPACTAR A 1 HOJA
 ========================== */
 @media print{
@@ -212,12 +254,8 @@ button{
   #formulario{
     font-size:12px;
     line-height:1.15;
-
-    /* Chrome/Edge */
-    zoom:0.95;
-
-    /* Fallback Firefox */
-    transform: scale(0.95);
+    zoom:0.95; /* Chrome/Edge */
+    transform: scale(0.95); /* Firefox fallback */
     transform-origin: top left;
     width: 105.3%;
   }
@@ -393,12 +431,10 @@ button{
     <div class="error-text" id="err_motivacion">Este campo es obligatorio.</div>
   </div>
 
-  <!-- ✅ FIRMAS ALINEADAS -->
   <div class="signature-block">
 
-    <!-- ✅ TEXTO NUEVO -->
     <div class="uso-exclusivo">
-      ESTE ESPACIO ES PARA USO EXCLUSIVO DEL DEPARTAMENTO DE PROYECTO DE GRADO.
+      Este espacio es para uso exclusivo del Departamento de Proyecto de Grado.
     </div>
 
     <div class="signature-grid">
@@ -422,7 +458,6 @@ button{
 
 </div>
 
-<!-- ✅ Toast -->
 <div id="toast" class="toast">PDF generado correctamente.</div>
 
 <script>
@@ -674,7 +709,7 @@ function validarAntesDeImprimir() {
   return ok;
 }
 
-/* ✅ Toast */
+/* Toast */
 function mostrarToast(msg){
   const t = document.getElementById("toast");
   if (!t) return;
@@ -683,7 +718,7 @@ function mostrarToast(msg){
   setTimeout(() => t.classList.remove("show"), 1500);
 }
 
-/* ✅ Limpiar formulario */
+/* Limpiar formulario */
 function limpiarFormulario() {
   document.querySelectorAll("input, textarea").forEach(el => {
     if (el.type !== "button") el.value = "";
@@ -768,12 +803,9 @@ function generarPDF() {
 
   if (document.activeElement) document.activeElement.blur();
 
-  // ✅ Mostrar mensaje antes de abrir impresión
   mostrarToast("PDF generado correctamente.");
-
   window.print();
 
-  // ✅ Limpiar luego de imprimir (con pequeño delay)
   setTimeout(() => {
     limpiarFormulario();
   }, 900);
