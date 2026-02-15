@@ -86,7 +86,7 @@ h3{ text-align:center; margin:18px 0 16px; }
   line-height:1.25;
 }
 
-/* Temas: 2 líneas aprox */
+/* Temas */
 .topic-box{
   min-height:48px;
   height:auto;
@@ -163,14 +163,45 @@ button{
   margin-top:14px;
 }
 
+/* ✅ Texto de uso exclusivo */
+.uso-exclusivo{
+  font-size:12px;
+  font-style:italic;
+  margin-bottom:14px;
+  margin-top:6px;
+  color:#333;
+  text-align:center;
+}
+
+/* ✅ Mensaje verde de éxito */
+.toast{
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: #0b6b2a;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 9999;
+}
+.toast.show{
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
 /* ==========================
    ✅ PRINT: COMPACTAR A 1 HOJA
 ========================== */
 @media print{
-  button{ display:none !important; }
+  button, .toast{ display:none !important; }
   body{ background:#fff; }
 
-  /* Quita espacio extra del contenedor */
   .form-container{
     border:none;
     margin:0 auto;
@@ -178,7 +209,6 @@ button{
     max-width:100%;
   }
 
-  /* Compacta tipografía y espaciados SOLO al imprimir */
   #formulario{
     font-size:12px;
     line-height:1.15;
@@ -189,8 +219,6 @@ button{
     /* Fallback Firefox */
     transform: scale(0.95);
     transform-origin: top left;
-
-    /* Evita que el transform “reduzca” el ancho disponible */
     width: 105.3%;
   }
 
@@ -206,17 +234,14 @@ button{
     padding:2px 2px;
   }
 
-  /* Baja alturas mínimas de textareas para que quepa */
   .field textarea{ min-height:48px; }
   .topic-box{ min-height:34px; }
 
-  /* Mantener bloques juntos */
   .grid-2, .grid-3, .header, .signature-block, .footer-note, .signature-grid{
     break-inside:avoid;
     page-break-inside:avoid;
   }
 
-  /* Asegura texto negro */
   input, textarea, select{
     color:#000 !important;
     -webkit-text-fill-color:#000 !important;
@@ -368,7 +393,14 @@ button{
     <div class="error-text" id="err_motivacion">Este campo es obligatorio.</div>
   </div>
 
+  <!-- ✅ FIRMAS ALINEADAS -->
   <div class="signature-block">
+
+    <!-- ✅ TEXTO NUEVO -->
+    <div class="uso-exclusivo">
+      Este espacio es para uso exclusivo del Departamento de Proyecto de Grado.
+    </div>
+
     <div class="signature-grid">
       <div class="label">Firma Director de Carrera:</div>
       <div class="line"></div>
@@ -390,9 +422,13 @@ button{
 
 </div>
 
+<!-- ✅ Toast -->
+<div id="toast" class="toast">PDF generado correctamente.</div>
+
 <script>
 function soloDigitos(valor) { return valor.replace(/\D/g, ''); }
 
+/* CUATRIMESTRE AUTO */
 function calcularCuatrimestreAutomatico() {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -623,7 +659,6 @@ function validarAntesDeImprimir() {
 
   if (!validarTemaPreferido()) ok = false;
 
-  // Formatear teléfonos antes de imprimir
   document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
     aplicarMascaraTelefono(inp);
     const m = inp.id.match(/^est(\d)_/);
@@ -637,6 +672,33 @@ function validarAntesDeImprimir() {
   }
 
   return ok;
+}
+
+/* ✅ Toast */
+function mostrarToast(msg){
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1500);
+}
+
+/* ✅ Limpiar formulario */
+function limpiarFormulario() {
+  document.querySelectorAll("input, textarea").forEach(el => {
+    if (el.type !== "button") el.value = "";
+  });
+
+  const pref = document.getElementById("tema_pref");
+  if (pref) pref.selectedIndex = 0;
+
+  document.querySelectorAll(".invalid").forEach(el => el.classList.remove("invalid"));
+  document.querySelectorAll(".error-text").forEach(el => el.classList.remove("show"));
+
+  const cuat = document.getElementById("cuatrimestre");
+  if (cuat) cuat.value = calcularCuatrimestreAutomatico();
+
+  validarTemaPreferido();
 }
 
 /* Hooks */
@@ -703,9 +765,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function generarPDF() {
   if (!validarAntesDeImprimir()) return;
-  // ✅ Quita foco para que no imprima el amarillo del :focus
+
   if (document.activeElement) document.activeElement.blur();
+
+  // ✅ Mostrar mensaje antes de abrir impresión
+  mostrarToast("PDF generado correctamente.");
+
   window.print();
+
+  // ✅ Limpiar luego de imprimir (con pequeño delay)
+  setTimeout(() => {
+    limpiarFormulario();
+  }, 900);
 }
 </script>
 
