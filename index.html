@@ -6,7 +6,8 @@
 <title>Formulario Anteproyecto UTESA</title>
 
 <style>
-@page { size: letter; margin: 18mm 15mm; }
+/* ✅ AJUSTE CLAVE PARA 1 HOJA */
+@page { size: letter; margin: 10mm 10mm; }
 
 body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; }
 
@@ -119,30 +120,7 @@ button{
   margin-right:auto;
 }
 
-/* PRINT */
-@media print{
-  button{ display:none !important; }
-  body{ background:#fff; }
-  .form-container{
-    border:none;
-    margin:0 auto;
-    padding:0;
-    max-width:100%;
-  }
-  .grid-2, .grid-3, .header, .signature-block, .footer-note{
-    break-inside:avoid;
-    page-break-inside:avoid;
-  }
-  input, textarea, select{
-    color:#000 !important;
-    -webkit-text-fill-color:#000 !important;
-  }
-  input::placeholder, textarea::placeholder { color: transparent !important; }
-}
-
-/* =========================================
-   ✅ ESTILO FOCO (AMARILLO + VERDE + SOMBRA)
-========================================= */
+/* ✅ ESTILO FOCO */
 .field input:focus,
 .field textarea:focus,
 .field select:focus{
@@ -158,9 +136,7 @@ button{
   box-shadow:0 2px 6px rgba(192,0,0,0.15);
 }
 
-/* =========================================
-   ✅ FIRMAS ALINEADAS (GRID FIJO)
-========================================= */
+/* ✅ FIRMAS ALINEADAS */
 .signature-block{
   margin-top:24px;
   font-size:13px;
@@ -185,6 +161,67 @@ button{
 .footer-note{
   font-size:12px;
   margin-top:14px;
+}
+
+/* ==========================
+   ✅ PRINT: COMPACTAR A 1 HOJA
+========================== */
+@media print{
+  button{ display:none !important; }
+  body{ background:#fff; }
+
+  /* Quita espacio extra del contenedor */
+  .form-container{
+    border:none;
+    margin:0 auto;
+    padding:0;
+    max-width:100%;
+  }
+
+  /* Compacta tipografía y espaciados SOLO al imprimir */
+  #formulario{
+    font-size:12px;
+    line-height:1.15;
+
+    /* Chrome/Edge */
+    zoom:0.95;
+
+    /* Fallback Firefox */
+    transform: scale(0.95);
+    transform-origin: top left;
+
+    /* Evita que el transform “reduzca” el ancho disponible */
+    width: 105.3%;
+  }
+
+  h3{ margin:12px 0 10px; }
+  .section-title{ margin-top:10px; margin-bottom:6px; }
+
+  .grid-2{ gap:24px; margin-bottom:10px; }
+  .grid-3{ gap:16px; margin-bottom:8px; }
+
+  .field label{ font-size:12px; }
+  .field input, .field textarea, .field select{
+    font-size:12px;
+    padding:2px 2px;
+  }
+
+  /* Baja alturas mínimas de textareas para que quepa */
+  .field textarea{ min-height:48px; }
+  .topic-box{ min-height:34px; }
+
+  /* Mantener bloques juntos */
+  .grid-2, .grid-3, .header, .signature-block, .footer-note, .signature-grid{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  /* Asegura texto negro */
+  input, textarea, select{
+    color:#000 !important;
+    -webkit-text-fill-color:#000 !important;
+  }
+  input::placeholder, textarea::placeholder { color: transparent !important; }
 }
 </style>
 </head>
@@ -331,7 +368,6 @@ button{
     <div class="error-text" id="err_motivacion">Este campo es obligatorio.</div>
   </div>
 
-  <!-- ✅ FIRMAS ALINEADAS -->
   <div class="signature-block">
     <div class="signature-grid">
       <div class="label">Firma Director de Carrera:</div>
@@ -357,10 +393,6 @@ button{
 <script>
 function soloDigitos(valor) { return valor.replace(/\D/g, ''); }
 
-/* ===============================
-   CUATRIMESTRE AUTO (N-AAAA)
-   Ene-Abr => 1, May-Ago => 2, Sep-Dic => 3
-================================= */
 function calcularCuatrimestreAutomatico() {
   const now = new Date();
   const month = now.getMonth() + 1;
@@ -373,7 +405,7 @@ function calcularCuatrimestreAutomatico() {
 }
 
 function formatCuatrimestre(value) {
-  const digits = soloDigitos(value).slice(0, 5); // 1 + 4
+  const digits = soloDigitos(value).slice(0, 5);
   if (digits.length <= 1) return digits;
   return digits[0] + "-" + digits.slice(1);
 }
@@ -609,11 +641,9 @@ function validarAntesDeImprimir() {
 
 /* Hooks */
 document.addEventListener("DOMContentLoaded", () => {
-  // Autocompletar cuatrimestre
   const cuat = document.getElementById("cuatrimestre");
   if (cuat && cuat.value.trim() === "") cuat.value = calcularCuatrimestreAutomatico();
 
-  // Cuatrimestre: máscara y validación
   if (cuat) {
     cuat.addEventListener("input", () => {
       cuat.value = formatCuatrimestre(cuat.value);
@@ -626,7 +656,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Teléfonos
   document.querySelectorAll('[data-validate="telefono"]').forEach(inp => {
     inp.addEventListener("input", () => {
       aplicarMascaraTelefono(inp);
@@ -635,14 +664,12 @@ document.addEventListener("DOMContentLoaded", () => {
     inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
   });
 
-  // Matrículas
   document.querySelectorAll('[data-validate="matricula"]').forEach(inp => {
     inp.addEventListener("input", onMatriculaInput);
     inp.addEventListener("keydown", onMatriculaKeyDown);
     inp.addEventListener("blur", () => validarGrupoEstudianteDesdeCampo(inp));
   });
 
-  // Nombres
   [1,2,3].forEach(n => {
     const nombre = document.getElementById(`est${n}_nombre`);
     if (!nombre) return;
@@ -650,7 +677,6 @@ document.addEventListener("DOMContentLoaded", () => {
     nombre.addEventListener("blur", () => validarEstudiante(n));
   });
 
-  // Temas y preferido
   ["tema1","tema2","tema3"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -664,7 +690,6 @@ document.addEventListener("DOMContentLoaded", () => {
     pref.addEventListener("blur", validarTemaPreferido);
   }
 
-  // Limpiar rojo en campos generales
   ["carrera","motivacion"].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -678,6 +703,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function generarPDF() {
   if (!validarAntesDeImprimir()) return;
+  // ✅ Quita foco para que no imprima el amarillo del :focus
+  if (document.activeElement) document.activeElement.blur();
   window.print();
 }
 </script>
